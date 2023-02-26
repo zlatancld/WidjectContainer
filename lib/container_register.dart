@@ -11,6 +11,7 @@ abstract class ContainerRegister {
   RegistrationBuilder addWidget<T extends Widget>(
       T Function(DependencyProvider, Key? key, dynamic args) instanceFactory);
   void addScopedWidget<T extends Widget>(
-      Scope<T> Function(DependencyProvider, Key? key, dynamic args) instanceFactory);
+      Scope<T> Function(DependencyProvider, Key? key, dynamic args)
+          instanceFactory);
   install(Installer installer);
 }

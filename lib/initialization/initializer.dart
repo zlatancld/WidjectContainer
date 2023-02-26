@@ -1,3 +1,3 @@
-abstract class Initializer{
+abstract class Initializer {
   Future initialize();
 }

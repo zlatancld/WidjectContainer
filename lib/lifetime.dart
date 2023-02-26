@@ -1,5 +1,1 @@
-enum Lifetime {
-  singleton,
-  transient,
-  scoped
-}
+enum Lifetime { singleton, transient, scoped }

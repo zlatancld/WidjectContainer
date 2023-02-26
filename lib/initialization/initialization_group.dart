@@ -1,5 +1,1 @@
-enum InitializationGroup{
-  early,
-  normal,
-  late
-}
+enum InitializationGroup { early, normal, late }

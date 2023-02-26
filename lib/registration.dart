@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 class Registration {
   final List<Type> _types;
   final Lifetime lifetime;
-  final Function(DependencyProvider provider, Key? key, dynamic args) instanceFactory;
+  final Function(DependencyProvider provider, Key? key, dynamic args)
+      instanceFactory;
 
   Registration(this._types, this.lifetime, this.instanceFactory);
 
-  Iterable<Type> get types
-  	=> _types;
+  Iterable<Type> get types => _types;
 }
