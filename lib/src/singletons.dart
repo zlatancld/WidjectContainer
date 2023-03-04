@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:widject_container/dependency_provider.dart';
-import 'package:widject_container/registration.dart';
+import 'package:widject_container/src/registration.dart';
 import 'package:flutter/foundation.dart';
 
 class Singletons {

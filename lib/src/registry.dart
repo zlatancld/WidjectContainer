@@ -1,6 +1,6 @@
 import 'dart:collection';
-import 'package:widject_container/readonly_registry.dart';
-import 'package:widject_container/registration.dart';
+import 'package:widject_container/src/readonly_registry.dart';
+import 'package:widject_container/src/registration.dart';
 
 class Registry implements ReadonlyRegistry {
   final HashMap<Type, Registration> _registrations;

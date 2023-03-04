@@ -1,6 +1,6 @@
 import 'package:widject_container/container_builder.dart';
 import 'package:widject_container/container_register.dart';
-import 'package:widject_container/dependency_container.dart';
+import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
 import 'package:flutter/widgets.dart';

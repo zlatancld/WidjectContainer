@@ -1,7 +1,7 @@
 import 'package:widject_container/lifetime.dart';
-import 'package:widject_container/readonly_registry.dart';
-import 'package:widject_container/registration_resolver.dart';
-import 'package:widject_container/registration_resolver_factory.dart';
+import 'package:widject_container/src/readonly_registry.dart';
+import 'package:widject_container/src/registration_resolver.dart';
+import 'package:widject_container/src/registration_resolver_factory.dart';
 import 'package:flutter/widgets.dart';
 
 class DependencyContainer {

@@ -1,4 +1,4 @@
-import 'package:widject_container/dependency_container.dart';
+import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/scope.dart';
 import 'package:flutter/widgets.dart';
 
