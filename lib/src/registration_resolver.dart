@@ -1,9 +1,9 @@
-import 'package:widject_container/dependency_container.dart';
+import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
-import 'package:widject_container/initialization/initialization_controller.dart';
+import 'package:widject_container/src/initialization/initialization_controller.dart';
 import 'package:widject_container/lifetime.dart';
-import 'package:widject_container/registration.dart';
-import 'package:widject_container/singletons.dart';
+import 'package:widject_container/src/registration.dart';
+import 'package:widject_container/src/singletons.dart';
 import 'package:flutter/foundation.dart';
 
 class RegistrationResolver {

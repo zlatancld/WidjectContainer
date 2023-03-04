@@ -1,15 +1,15 @@
 import 'package:widject_container/container_register.dart';
-import 'package:widject_container/dependency_container.dart';
+import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
-import 'package:widject_container/initialization/initialization_controller.dart';
+import 'package:widject_container/src/initialization/initialization_controller.dart';
 import 'package:widject_container/installer.dart';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/registration_builder.dart';
-import 'package:widject_container/registration_resolver_factory.dart';
-import 'package:widject_container/registry.dart';
+import 'package:widject_container/src/registration_resolver_factory.dart';
+import 'package:widject_container/src/registry.dart';
 import 'package:widject_container/scope.dart';
-import 'package:widject_container/singletons.dart';
+import 'package:widject_container/src/singletons.dart';
 import 'package:widject_container/widget_provider.dart';
 import 'package:flutter/widgets.dart';
 

@@ -1,6 +1,6 @@
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/lifetime.dart';
-import 'package:widject_container/registration.dart';
+import 'package:widject_container/src/registration.dart';
 import 'package:flutter/foundation.dart';
 
 class RegistrationBuilder {
