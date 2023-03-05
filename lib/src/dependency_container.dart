@@ -47,7 +47,7 @@ class DependencyContainer {
   }
 
   Iterable<RegistrationResolver> _getMultipleResolvers<T>() {
-    var registrations = _registry.tryGetCollection(T) ?? [];
+    var registrations = _registry.getCollection(T);
     var resolvers = registrations
         .map(
             (registration) => _registrationResolverFactory.create(registration))

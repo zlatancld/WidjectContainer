@@ -44,7 +44,13 @@ class Registry implements ReadonlyRegistry {
   }
 
   @override
-  Iterable<Registration>? tryGetCollection(Type type) {
-    return _collectionRegistrations[type];
+  Iterable<Registration> getCollection(Type type) {
+    var collection = _collectionRegistrations[type];
+    if(collection != null) return collection;
+
+    var singleRegistration = tryGet(type);
+    if(singleRegistration != null) return [singleRegistration];
+
+    return [];
   }
 }
