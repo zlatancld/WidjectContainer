@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.2] - 2023-03-05
+### Bug Fix
+- Return iterable of required type even when only a single type has been registered.
+
 ## [0.1.1] - 2023-03-04
 
 Preparation for pub.dev release.
