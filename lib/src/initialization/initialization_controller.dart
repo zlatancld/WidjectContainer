@@ -39,8 +39,8 @@ class InitializationController implements Initializer {
           _getRegisteredForGroup(InitializationGroup.normal) ??
           _getRegisteredForGroup(InitializationGroup.late)!;
 
-      _registeredInstances.remove(initializable);
       await initializable.initialize();
+      _registeredInstances.remove(initializable);
       _initializedInstances.add(initializable);
     }
   }
