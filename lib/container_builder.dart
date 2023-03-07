@@ -1,4 +1,5 @@
 import 'package:widject_container/container_register.dart';
+import 'package:widject_container/initialization/initializable.dart';
 import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
@@ -75,6 +76,9 @@ class ContainerBuilder implements ContainerRegister {
         registry, registrationResolverFactory, parentContainer);
     _addPostBuild(_PrivateProvider<DependencyContainer>(container), registry);
 
+    _preWarmNonTransientInitializables(registry, registrationResolverFactory,
+      container, initializationController);
+
     return container;
   }
 
@@ -103,6 +107,14 @@ class ContainerBuilder implements ContainerRegister {
         RegistrationBuilder(T, Lifetime.transient, (_, __, ___) => instance);
     var registration = builder.build();
     registry.add(registration);
+  }
+
+  void _preWarmNonTransientInitializables(Registry registry,
+      RegistrationResolverFactory registrationResolverFactory,
+      DependencyContainer container, InitializationController initializationController){
+    registry.getCollection(Initializable)
+        .where((element) => element.lifetime != Lifetime.transient)
+        .map((e) => registrationResolverFactory.create(e).solve(container));
   }
 }
 
