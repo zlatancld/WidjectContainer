@@ -1,7 +1,6 @@
 # Change Log
 
 ## [0.1.3] - 2023-03-08
-
 ### Changed
 - Instantiate non-transient initializables when the container is built.
 
@@ -13,7 +12,6 @@
 - Return iterable of required type even when only a single type has been registered.
 
 ## [0.1.1] - 2023-03-04
-
 Preparation for pub.dev release.
 
 ### Changed

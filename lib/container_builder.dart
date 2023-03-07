@@ -114,7 +114,8 @@ class ContainerBuilder implements ContainerRegister {
       DependencyContainer container, InitializationController initializationController){
     registry.getCollection(Initializable)
         .where((element) => element.lifetime != Lifetime.transient)
-        .map((e) => registrationResolverFactory.create(e).solve(container));
+        .map((e) => registrationResolverFactory.create(e).solve(container))
+        .forEach((e) => initializationController.register(e));
   }
 }
 
