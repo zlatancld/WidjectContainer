@@ -1,6 +1,14 @@
 # Change Log
 
 ## [0.1.2] - 2023-03-05
+
+### Changed
+- Instantiate non-transient initializables when the container is built.
+
+### Bug Fix
+- Fixed bug in initialization flow causing multiple initialization on the same object during concurrent async calls.
+
+## [0.1.2] - 2023-03-05
 ### Bug Fix
 - Return iterable of required type even when only a single type has been registered.
 
