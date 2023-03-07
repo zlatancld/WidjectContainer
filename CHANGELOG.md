@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.1.3] - 2023-03-08
+## [0.1.4] - 2023-03-08
 ### Changed
 - Instantiate non-transient initializables when the container is built.
 
