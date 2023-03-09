@@ -1,6 +1,6 @@
-import 'package:widject_container/src/registration.dart';
+import 'package:widject_container/src/registration_resolver.dart';
 
 abstract class ReadonlyRegistry {
-  Registration? tryGet(Type type);
-  Iterable<Registration> getCollection(Type type);
+  RegistrationResolver? tryGet(Type type);
+  Iterable<RegistrationResolver> getCollection(Type type);
 }
