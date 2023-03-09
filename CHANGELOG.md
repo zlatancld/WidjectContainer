@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.1.5] - 2023-03-10
+## [0.1.6] - 2023-03-10
 ### Bug Fix
 - Fix singleton resolution when same concrete type is registered in parent as singleton.
 - Fix initialization related to singleton resolved in parent scope.
