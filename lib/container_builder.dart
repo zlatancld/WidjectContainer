@@ -65,7 +65,7 @@ class ContainerBuilder implements ContainerRegister {
     var registry = _createRegistry(parentProvider);
     var container = DependencyContainer(registry);
 
-    _addPostBuild(_PrivateProvider<DependencyContainer>(container), registry);
+    _addPostRegistry(_PrivateProvider<DependencyContainer>(container), registry);
     _preWarmNonTransientInitializables(registry, container);
 
     return container;
@@ -98,8 +98,7 @@ class ContainerBuilder implements ContainerRegister {
 
     var registry = Registry(registrations, parentRegistry,
         registrationResolverFactory);
-    add<_PrivateProvider<Registry>>((p) => _PrivateProvider<Registry>(registry),
-        Lifetime.transient);
+    _addPostRegistry(_PrivateProvider<Registry>(registry), registry);
 
     return registry;
   }
@@ -110,7 +109,7 @@ class ContainerBuilder implements ContainerRegister {
         Lifetime.transient);
   }
 
-  _addPostBuild<T>(T instance, Registry registry) {
+  _addPostRegistry<T>(T instance, Registry registry) {
     var builder =
         RegistrationBuilder(T, Lifetime.transient, (_, __, ___) => instance);
     var registration = builder.build();
