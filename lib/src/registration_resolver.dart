@@ -40,4 +40,7 @@ class RegistrationResolver {
     _initializationController.register(instance);
     return instance;
   }
+
+  Lifetime get lifetime
+    => _registration.lifetime;
 }

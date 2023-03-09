@@ -2,13 +2,16 @@ import 'dart:collection';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/src/readonly_registry.dart';
 import 'package:widject_container/src/registration.dart';
+import 'package:widject_container/src/registration_resolver.dart';
+import 'package:widject_container/src/registration_resolver_factory.dart';
 
 class Registry implements ReadonlyRegistry {
   final Registry? _parent;
-  final HashMap<Type, Registration> _registrations;
-  final HashMap<Type, List<Registration>> _collectionRegistrations;
+  final HashMap<Type, RegistrationResolver> _registrations;
+  final HashMap<Type, List<RegistrationResolver>> _collectionRegistrations;
+  final RegistrationResolverFactory _resolverFactory;
 
-  Registry(Iterable<Registration> registrations, this._parent)
+  Registry(Iterable<Registration> registrations, this._parent, this._resolverFactory)
       : _registrations = HashMap(),
         _collectionRegistrations = HashMap() {
     for (var registration in registrations) {
@@ -17,13 +20,13 @@ class Registry implements ReadonlyRegistry {
   }
 
   void add(Registration registration) {
-    var concreteRegistration = _getConcreteRegistration(registration);
+    var registrationResolver = _getRegistrationResolver(registration);
     for (var type in registration.types) {
-      _add(concreteRegistration, type);
+      _add(registrationResolver, type);
     }
   }
 
-  Registration _getConcreteRegistration(Registration registration){
+  RegistrationResolver _getRegistrationResolver(Registration registration){
     if(registration.lifetime == Lifetime.singleton){
       var singletonConcreteType = registration.concreteType;
       var parentRegistration = _parent?.tryGet(singletonConcreteType);
@@ -34,10 +37,10 @@ class Registry implements ReadonlyRegistry {
       }
     }
 
-    return registration;
+    return _resolverFactory.create(registration);
   }
 
-  void _add(Registration registration, Type type) {
+  void _add(RegistrationResolver registration, Type type) {
     var collection = _collectionRegistrations[type];
     if (collection != null) {
       collection.add(registration);
@@ -55,7 +58,7 @@ class Registry implements ReadonlyRegistry {
   }
 
   @override
-  Registration? tryGet(Type type) {
+  RegistrationResolver? tryGet(Type type) {
     var registration = _registrations[type];
 
     if(registration != null) return registration;
@@ -64,7 +67,7 @@ class Registry implements ReadonlyRegistry {
   }
 
   @override
-  Iterable<Registration> getCollection(Type type) {
+  Iterable<RegistrationResolver> getCollection(Type type) {
     var collection = _getLocalCollection(type).toSet();
 
     if(_parent != null){
@@ -75,13 +78,13 @@ class Registry implements ReadonlyRegistry {
     return collection;
   }
 
-  Iterable<Registration> _getLocalCollection(Type type){
+  Iterable<RegistrationResolver> _getLocalCollection(Type type){
     var collection = _collectionRegistrations[type];
     if(collection != null) return collection;
 
     var singleRegistration = tryGet(type);
     if(singleRegistration != null) return [singleRegistration];
 
-    return Iterable<Registration>.empty();
+    return Iterable<RegistrationResolver>.empty();
   }
 }
