@@ -148,20 +148,24 @@ Example of usage through ```WidgetProvider```:
 class AppWidget extends StatelessWidget {
   final MessageProvider _messageProvider;
   final WidgetProvider _widgetProvider;
-  
+
   const AppWidget(this._messageProvider, this._widgetProvider, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-        onPressed: () => _openChildWidget(context), 
-        child: Text(_messageProvider.getMessage())
-    );
+    return MaterialApp(
+      title: 'WidjectContainer Demo',
+      home: Scaffold(
+        body: TextButton(
+          onPressed: () => _openChildWidget(context),
+          child: Text(_messageProvider.getMessage()))));
   }
-  
-  _openChildWidget(BuildContext context){
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => _widgetProvider.getWidget<ScreenWidget>()));
+
+  _openChildWidget(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _widgetProvider.getWidget<ScreenWidget>()));
   }
 }
 ```
