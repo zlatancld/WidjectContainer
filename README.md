@@ -12,19 +12,7 @@ Simple DI package to help structure your Flutter application in loosely coupled 
 
 ## Installation
 
-1. Open your project's pubspec.yaml file.
-2. Add a git package dependency:
-
-      ```
-      dependencies:
-        # -------------------------- #
-        # Your existing dependencies #
-        # -------------------------- #
-        widject_container:
-          git:
-            url: https://github.com/zlatancld/WidjectContainer
-      ```
-3. Execute ```flutter pub get```.
+Add the package with the command: ```flutter pub add widject_container``` or adding ```widject_container``` to your project's pubspec.yaml dependencies.
 
 ## Basic Usage
 

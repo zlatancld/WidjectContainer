@@ -1,6 +1,6 @@
 name: widject_container
-description: Dependency Injection package for Flutter.
-version: 0.1.6
+description: Dependency Injection Container package to structure your application in loosely coupled components. Nested scopes support to separate bindings by widget type. Embedded initialization system to easily initialize registered instances.
+version: 0.1.7
 homepage: https://github.com/zlatancld/WidjectContainer
 repository: https://github.com/zlatancld/WidjectContainer
 
