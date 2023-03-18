@@ -174,7 +174,7 @@ WidjectContainer is inspired by:
 
 ## Author
 
-[@zlatancld](https://www.linkedin.com/in/zlatancld)
+[Claudio Mazza](https://www.linkedin.com/in/zlatancld)
 
 ## License
 
