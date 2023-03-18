@@ -3,15 +3,17 @@ import 'dart:collection';
 import 'package:widject_container/initialization/initializable.dart';
 import 'package:widject_container/initialization/initialization_group.dart';
 import 'package:widject_container/initialization/initializer.dart';
+import 'package:widject_container/src/initialization/initialization_state.dart';
 
 class InitializationController implements Initializer {
   final HashSet<Initializable> _registeredInstances;
   final HashSet<Initializable> _initializedInstances;
   final InitializationController? _parent;
+  final InitializationState _state;
 
   Future? _currentInitialization;
 
-  InitializationController(this._parent)
+  InitializationController(this._parent, this._state)
       : _registeredInstances = HashSet(),
         _initializedInstances = HashSet();
 
@@ -34,6 +36,9 @@ class InitializationController implements Initializer {
   }
 
   Future _initializeInternal() async {
+    if(_registeredInstances.isEmpty) return;
+
+    _state.setCompleted(false);
     while (_registeredInstances.isNotEmpty) {
       var initializable = _getRegisteredForGroup(InitializationGroup.early) ??
           _getRegisteredForGroup(InitializationGroup.normal) ??
@@ -43,6 +48,7 @@ class InitializationController implements Initializer {
       _registeredInstances.remove(initializable);
       _initializedInstances.add(initializable);
     }
+    _state.setCompleted(true);
   }
 
   Initializable? _getRegisteredForGroup(InitializationGroup group) {

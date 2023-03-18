@@ -1,5 +1,6 @@
 import 'package:widject_container/container_register.dart';
 import 'package:widject_container/initialization/initializable.dart';
+import 'package:widject_container/initialization/readonly_initialization_state.dart';
 import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
@@ -7,6 +8,7 @@ import 'package:widject_container/src/initialization/initialization_controller.d
 import 'package:widject_container/installer.dart';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/registration_builder.dart';
+import 'package:widject_container/src/initialization/initialization_state.dart';
 import 'package:widject_container/src/registration_resolver_factory.dart';
 import 'package:widject_container/src/registry.dart';
 import 'package:widject_container/scope.dart';
@@ -77,10 +79,12 @@ class ContainerBuilder implements ContainerRegister {
         ?.get<_PrivateProvider<InitializationController>>()
         .instance;
 
-    var controller = InitializationController(parentController);
-    add<Initializer>((p) => controller, Lifetime.transient);
+    var state = InitializationState();
+    var controller = InitializationController(parentController, state);
+    add<Initializer>((_) => controller, Lifetime.transient);
+    add<ReadonlyInitializationState>((_) => state, Lifetime.transient);
     add<_PrivateProvider<InitializationController>>(
-            (p) => _PrivateProvider<InitializationController>(controller),
+            (_) => _PrivateProvider<InitializationController>(controller),
         Lifetime.transient);
 
     return controller;
