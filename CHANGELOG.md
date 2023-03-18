@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.7] - 2023-03-18
+Initialization state.
+### Changed
+- Provide ReadonlyInitializationState to notify about initialization state changes.
+- Add separate initialization method in Scope.
+
 ## [0.1.6] - 2023-03-10
 ### Bug Fix
 - Fix singleton resolution when same concrete type is registered in parent as singleton.
@@ -24,5 +30,4 @@ Preparation for pub.dev release.
 - Add changelog file.
 
 ## [0.1.0] - 2023-02-26
-
 Main release with core functionalities.
