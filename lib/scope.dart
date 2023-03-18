@@ -13,9 +13,7 @@ abstract class Scope<T extends Widget> {
 
   Future<T> getInitializedWidget({Key? key, dynamic args}) async {
     var widget = getWidget(key: key, args: args);
-    var container = _getContainer();
-    var initializationController = container.tryGet<Initializer>();
-    await initializationController.initialize();
+    await initialize();
     return widget;
   }
 
@@ -27,6 +25,12 @@ abstract class Scope<T extends Widget> {
       throw Exception("Widget $T hasn't been registered in scope $runtimeType");
 
     return widget;
+  }
+
+  Future initialize(){
+    var container = _getContainer();
+    var initializationController = container.tryGet<Initializer>();
+    return initializationController.initialize();
   }
 
   DependencyContainer _getContainer() {
