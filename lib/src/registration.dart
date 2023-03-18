@@ -9,7 +9,8 @@ class Registration {
   final Function(DependencyProvider provider, Key? key, dynamic args)
       instanceFactory;
 
-  Registration(this.concreteType, this._types, this.lifetime, this.instanceFactory);
+  Registration(
+      this.concreteType, this._types, this.lifetime, this.instanceFactory);
 
   Iterable<Type> get types => _types;
 }

@@ -11,7 +11,8 @@ class Registry implements ReadonlyRegistry {
   final HashMap<Type, List<RegistrationResolver>> _collectionRegistrations;
   final RegistrationResolverFactory _resolverFactory;
 
-  Registry(Iterable<Registration> registrations, this._parent, this._resolverFactory)
+  Registry(
+      Iterable<Registration> registrations, this._parent, this._resolverFactory)
       : _registrations = HashMap(),
         _collectionRegistrations = HashMap() {
     for (var registration in registrations) {
@@ -26,13 +27,13 @@ class Registry implements ReadonlyRegistry {
     }
   }
 
-  RegistrationResolver _getRegistrationResolver(Registration registration){
-    if(registration.lifetime == Lifetime.singleton){
+  RegistrationResolver _getRegistrationResolver(Registration registration) {
+    if (registration.lifetime == Lifetime.singleton) {
       var singletonConcreteType = registration.concreteType;
       var parentRegistration = _parent?.tryGet(singletonConcreteType);
 
-      if(parentRegistration != null
-          && parentRegistration.lifetime == Lifetime.singleton){
+      if (parentRegistration != null &&
+          parentRegistration.lifetime == Lifetime.singleton) {
         return parentRegistration;
       }
     }
@@ -61,7 +62,7 @@ class Registry implements ReadonlyRegistry {
   RegistrationResolver? tryGet(Type type) {
     var registration = _registrations[type];
 
-    if(registration != null) return registration;
+    if (registration != null) return registration;
 
     return _parent?.tryGet(type);
   }
@@ -70,7 +71,7 @@ class Registry implements ReadonlyRegistry {
   Iterable<RegistrationResolver> getCollection(Type type) {
     var collection = _getLocalCollection(type).toSet();
 
-    if(_parent != null){
+    if (_parent != null) {
       var parentLocalCollection = _parent!._getLocalCollection(type);
       collection.addAll(parentLocalCollection);
     }
@@ -78,12 +79,12 @@ class Registry implements ReadonlyRegistry {
     return collection;
   }
 
-  Iterable<RegistrationResolver> _getLocalCollection(Type type){
+  Iterable<RegistrationResolver> _getLocalCollection(Type type) {
     var collection = _collectionRegistrations[type];
-    if(collection != null) return collection;
+    if (collection != null) return collection;
 
     var singleRegistration = tryGet(type);
-    if(singleRegistration != null) return [singleRegistration];
+    if (singleRegistration != null) return [singleRegistration];
 
     return Iterable<RegistrationResolver>.empty();
   }

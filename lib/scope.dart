@@ -27,7 +27,7 @@ abstract class Scope<T extends Widget> {
     return widget;
   }
 
-  Future initialize(){
+  Future initialize() {
     var container = _getContainer();
     var initializationController = container.tryGet<Initializer>();
     return initializationController.initialize();

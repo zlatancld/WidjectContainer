@@ -25,6 +25,6 @@ class RegistrationBuilder {
     return this;
   }
 
-  Registration build() =>
-      Registration(_concreteType, _types.toList(growable: false), _lifetime, _instanceFactory);
+  Registration build() => Registration(_concreteType,
+      _types.toList(growable: false), _lifetime, _instanceFactory);
 }
