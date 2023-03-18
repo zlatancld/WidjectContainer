@@ -36,7 +36,7 @@ class InitializationController implements Initializer {
   }
 
   Future _initializeInternal() async {
-    if(_registeredInstances.isEmpty) return;
+    if (_registeredInstances.isEmpty) return;
 
     _state.setCompleted(false);
     while (_registeredInstances.isNotEmpty) {

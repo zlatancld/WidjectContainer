@@ -41,6 +41,5 @@ class RegistrationResolver {
     return instance;
   }
 
-  Lifetime get lifetime
-    => _registration.lifetime;
+  Lifetime get lifetime => _registration.lifetime;
 }

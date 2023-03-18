@@ -6,11 +6,11 @@ class InitializationState extends ReadonlyInitializationState {
   @override
   bool get isCompleted => _isCompleted == true;
 
-  void setCompleted(bool isCompleted){
+  void setCompleted(bool isCompleted) {
     var notify = _isCompleted != isCompleted;
     _isCompleted = isCompleted;
 
-    if(notify){
+    if (notify) {
       notifyListeners();
     }
   }

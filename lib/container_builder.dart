@@ -67,7 +67,8 @@ class ContainerBuilder implements ContainerRegister {
     var registry = _createRegistry(parentProvider);
     var container = DependencyContainer(registry);
 
-    _addPostRegistry(_PrivateProvider<DependencyContainer>(container), registry);
+    _addPostRegistry(
+        _PrivateProvider<DependencyContainer>(container), registry);
     _preWarmNonTransientInitializables(registry, container);
 
     return container;
@@ -84,7 +85,7 @@ class ContainerBuilder implements ContainerRegister {
     add<Initializer>((_) => controller, Lifetime.transient);
     add<ReadonlyInitializationState>((_) => state, Lifetime.transient);
     add<_PrivateProvider<InitializationController>>(
-            (_) => _PrivateProvider<InitializationController>(controller),
+        (_) => _PrivateProvider<InitializationController>(controller),
         Lifetime.transient);
 
     return controller;
@@ -95,20 +96,21 @@ class ContainerBuilder implements ContainerRegister {
     var parentRegistry =
         parentProvider?.get<_PrivateProvider<Registry>>().instance;
     var singletons = Singletons();
-    var initializationController = _createInitializationController(
-        parentProvider);
-    var registrationResolverFactory = RegistrationResolverFactory(singletons,
-        initializationController);
+    var initializationController =
+        _createInitializationController(parentProvider);
+    var registrationResolverFactory =
+        RegistrationResolverFactory(singletons, initializationController);
 
-    var registry = Registry(registrations, parentRegistry,
-        registrationResolverFactory);
+    var registry =
+        Registry(registrations, parentRegistry, registrationResolverFactory);
     _addPostRegistry(_PrivateProvider<Registry>(registry), registry);
 
     return registry;
   }
 
   void _addWidgetProvider() {
-    add<WidgetProvider>((p) => WidgetProvider(
+    add<WidgetProvider>(
+        (p) => WidgetProvider(
             p.get<_PrivateProvider<DependencyContainer>>().instance),
         Lifetime.transient);
   }
@@ -120,12 +122,13 @@ class ContainerBuilder implements ContainerRegister {
     registry.add(registration);
   }
 
-  void _preWarmNonTransientInitializables(Registry registry,
-      DependencyContainer container){
-    var nonTransientRegistrations = registry.getCollection(Initializable)
+  void _preWarmNonTransientInitializables(
+      Registry registry, DependencyContainer container) {
+    var nonTransientRegistrations = registry
+        .getCollection(Initializable)
         .where((element) => element.lifetime != Lifetime.transient);
 
-    for(var registration in nonTransientRegistrations){
+    for (var registration in nonTransientRegistrations) {
       registration.solve(container);
     }
   }
