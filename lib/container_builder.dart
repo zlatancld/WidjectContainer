@@ -111,7 +111,8 @@ class ContainerBuilder implements ContainerRegister {
   void _addWidgetProvider() {
     add<WidgetProvider>(
         (p) => WidgetProvider(
-            p.get<_PrivateProvider<DependencyContainer>>().instance),
+            p.get<_PrivateProvider<DependencyContainer>>().instance,
+            p.get<_PrivateProvider<InitializationController>>().instance),
         Lifetime.transient);
   }
 
