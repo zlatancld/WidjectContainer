@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.8] - 2023-05-12
+### Bug Fix
+- Initialize widget even when not created through a scope.
+
 ## [0.1.7] - 2023-03-18
 Initialization state.
 ### Changed

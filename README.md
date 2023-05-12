@@ -1,7 +1,7 @@
 # WidjectContainer
 Dependency Injection package for Flutter
 
-Simple DI package to help structure your Flutter application in loosely coupled components.
+Simple DI package to help structure your Flutter application in loosely coupled components. Inspired by VContainer.
 
 ## Features
 
