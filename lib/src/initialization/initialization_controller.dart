@@ -36,9 +36,11 @@ class InitializationController implements Initializer {
   }
 
   Future _initializeInternal() async {
-    if (_registeredInstances.isEmpty) return;
+    if (!_hasInstancesToInitialize()) return;
 
     _state.setCompleted(false);
+    if (_parent != null) await _parent!.initialize();
+
     while (_registeredInstances.isNotEmpty) {
       var initializable = _getRegisteredForGroup(InitializationGroup.early) ??
           _getRegisteredForGroup(InitializationGroup.normal) ??
@@ -49,6 +51,12 @@ class InitializationController implements Initializer {
       _initializedInstances.add(initializable);
     }
     _state.setCompleted(true);
+  }
+
+  bool _hasInstancesToInitialize() {
+    if (_registeredInstances.isNotEmpty) return true;
+    if (_parent == null) return false;
+    return _parent!._hasInstancesToInitialize();
   }
 
   Initializable? _getRegisteredForGroup(InitializationGroup group) {
