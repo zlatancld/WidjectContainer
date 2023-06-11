@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.9] - 2023-06-11
+### Bug Fix
+- Initialize instances in parent scopes when initializing a sub-scope.
+
 ## [0.1.8] - 2023-05-12
 ### Bug Fix
 - Initialize widget even when not created through a scope.

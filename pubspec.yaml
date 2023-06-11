@@ -1,6 +1,6 @@
 name: widject_container
 description: Dependency Injection Container to structure your application in loosely coupled components. Inspired by VContainer.
-version: 0.1.8
+version: 0.1.9
 homepage: https://github.com/zlatancld/WidjectContainer
 repository: https://github.com/zlatancld/WidjectContainer
 
