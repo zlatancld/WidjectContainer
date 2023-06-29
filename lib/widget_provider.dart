@@ -10,14 +10,14 @@ class WidgetProvider {
   WidgetProvider(this._container, this._initializer);
 
   T getWidget<T extends Widget>({Key? key, dynamic args}) {
-    var scope = _tryGetScope<T>();
+    var scope = _tryGetScope<T>(key, args);
     if (scope != null) return scope.getWidget(key: key, args: args);
 
     return _getWidget<T>(key: key, args: args);
   }
 
-  Scope<T>? _tryGetScope<T extends Widget>() {
-    return _container.tryGetByType(Scope<T>);
+  Scope<T>? _tryGetScope<T extends Widget>(Key? key, dynamic args) {
+    return _container.tryGetByType(Scope<T>, key: key, args: args);
   }
 
   T _getWidget<T extends Widget>({Key? key, dynamic args}) {
@@ -31,7 +31,7 @@ class WidgetProvider {
 
   Future<T> getInitializedWidget<T extends Widget>(
       {Key? key, dynamic args}) async {
-    var scope = _tryGetScope<T>();
+    var scope = _tryGetScope<T>(key, args);
     if (scope != null)
       return await scope.getInitializedWidget(key: key, args: args);
 
