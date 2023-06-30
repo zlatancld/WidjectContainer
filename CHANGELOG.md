@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.1.10] - 2023-06-30
+### Bug Fix
+- Pass key and args to the scope resolver when resolving a widget through a scope.
+
 ## [0.1.9] - 2023-06-11
 ### Bug Fix
 - Initialize instances in parent scopes when initializing a sub-scope.
