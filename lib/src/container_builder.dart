@@ -9,6 +9,7 @@ import 'package:widject_container/installer.dart';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/registration_builder.dart';
 import 'package:widject_container/src/initialization/initialization_state.dart';
+import 'package:widject_container/src/registration_resolver_dependencies.dart';
 import 'package:widject_container/src/registration_resolver_factory.dart';
 import 'package:widject_container/src/registry.dart';
 import 'package:widject_container/scope.dart';
@@ -39,7 +40,8 @@ class ContainerBuilder implements ContainerRegister {
 
   @override
   RegistrationBuilder addWidget<T extends Widget>(
-      T Function(DependencyProvider p, Key? key, dynamic args) instanceFactory) {
+      T Function(DependencyProvider p, Key? key, dynamic args)
+          instanceFactory) {
     return _add<T>(instanceFactory, Lifetime.transient);
   }
 
@@ -64,55 +66,59 @@ class ContainerBuilder implements ContainerRegister {
   DependencyContainer build(DependencyProvider? parentProvider) {
     _addWidgetProvider();
 
-    var registry = _createRegistry(parentProvider);
-    var container = DependencyContainer(registry);
+    var singletons = _createSingletons();
+    var initializationController =
+        _createInitializationController(parentProvider);
+    var registry =
+        _createRegistry(parentProvider, singletons, initializationController);
+    var container =
+        DependencyContainer(registry, singletons, initializationController);
 
-    _addPostRegistry(
-        _PrivateProvider<DependencyContainer>(container), registry);
-    _preWarmNonTransientInitializables(registry, container);
+    _addPostRegistry(container, registry);
+    _preWarmSingletonInitializables(
+        registry, container, singletons, initializationController);
 
     return container;
   }
 
   InitializationController _createInitializationController(
       DependencyProvider? parentProvider) {
-    var parentController = parentProvider
-        ?.get<_PrivateProvider<InitializationController>>()
-        .instance;
+    var parentController = parentProvider?.get<InitializationController>();
 
     var state = InitializationState();
     var controller = InitializationController(parentController, state);
     add<Initializer>((_) => controller, Lifetime.transient);
     add<ReadonlyInitializationState>((_) => state, Lifetime.transient);
-    add<_PrivateProvider<InitializationController>>(
-        (_) => _PrivateProvider<InitializationController>(controller),
-        Lifetime.transient);
+    add<InitializationController>((_) => controller, Lifetime.transient);
 
     return controller;
   }
 
-  Registry _createRegistry(DependencyProvider? parentProvider) {
+  Registry _createRegistry(
+      DependencyProvider? parentProvider,
+      Singletons singletons,
+      InitializationController initializationController) {
     var registrations = _builders.map((builder) => builder.build());
-    var parentRegistry =
-        parentProvider?.get<_PrivateProvider<Registry>>().instance;
-    var singletons = Singletons();
-    var initializationController =
-        _createInitializationController(parentProvider);
-    var registrationResolverFactory =
+    var parentRegistry = parentProvider?.get<Registry>();
+    var resolverFactory =
         RegistrationResolverFactory(singletons, initializationController);
 
-    var registry =
-        Registry(registrations, parentRegistry, registrationResolverFactory);
-    _addPostRegistry(_PrivateProvider<Registry>(registry), registry);
+    var registry = Registry(registrations, parentRegistry, resolverFactory);
+    _addPostRegistry(registry, registry);
 
     return registry;
+  }
+
+  Singletons _createSingletons() {
+    var singletons = Singletons();
+    add<Singletons>((p) => singletons, Lifetime.transient);
+    return singletons;
   }
 
   void _addWidgetProvider() {
     add<WidgetProvider>(
         (p) => WidgetProvider(
-            p.get<_PrivateProvider<DependencyContainer>>().instance,
-            p.get<_PrivateProvider<InitializationController>>().instance),
+            p.get<DependencyContainer>(), p.get<InitializationController>()),
         Lifetime.transient);
   }
 
@@ -123,20 +129,19 @@ class ContainerBuilder implements ContainerRegister {
     registry.add(registration);
   }
 
-  void _preWarmNonTransientInitializables(
-      Registry registry, DependencyContainer container) {
+  void _preWarmSingletonInitializables(
+      Registry registry,
+      DependencyContainer container,
+      Singletons singletons,
+      InitializationController initializationController) {
     var nonTransientRegistrations = registry
         .getCollection(Initializable)
-        .where((element) => element.lifetime != Lifetime.transient);
+        .where((element) => element.lifetime == Lifetime.singleton);
 
+    var resolverDependencies = RegistrationResolverDependencies(
+        DependencyProvider(container), singletons, initializationController);
     for (var registration in nonTransientRegistrations) {
-      registration.solve(container);
+      registration.solve(resolverDependencies);
     }
   }
-}
-
-class _PrivateProvider<T> {
-  final T instance;
-
-  _PrivateProvider(this.instance);
 }

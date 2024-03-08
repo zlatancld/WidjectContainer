@@ -1,43 +1,36 @@
-import 'package:widject_container/src/dependency_container.dart';
-import 'package:widject_container/dependency_provider.dart';
-import 'package:widject_container/src/initialization/initialization_controller.dart';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/src/registration.dart';
-import 'package:widject_container/src/singletons.dart';
 import 'package:flutter/foundation.dart';
+import 'package:widject_container/src/registration_resolver_dependencies.dart';
 
 class RegistrationResolver {
   final Registration _registration;
-  final Singletons _singletons;
-  final InitializationController _initializationController;
+  final RegistrationResolverDependencies _registrationDeclarationDependencies;
 
   RegistrationResolver(
-      this._registration, this._singletons, this._initializationController);
+      this._registration, this._registrationDeclarationDependencies);
 
-  solve(DependencyContainer requester, {Key? key, dynamic args}) {
-    var provider = DependencyProvider(requester);
-
+  solve(RegistrationResolverDependencies requesterDependencies,
+      {Key? key, dynamic args}) {
     switch (_registration.lifetime) {
       case Lifetime.singleton:
+        return _solveSingleton(_registration, _registrationDeclarationDependencies, key, args);
       case Lifetime.scoped:
-        return _solveSingleton(_registration, provider, key, args);
-
+        return _solveSingleton(_registration, requesterDependencies, key, args);
       case Lifetime.transient:
-        return _solveTransient(_registration, provider, key, args);
+        return _solveTransient(_registration, requesterDependencies, key, args);
     }
   }
 
-  _solveSingleton(Registration registration, DependencyProvider provider,
-      Key? key, dynamic args) {
-    var instance = _singletons.getOrAdd(registration, provider, key, args);
-    _initializationController.register(instance);
+  _solveSingleton(Registration registration, RegistrationResolverDependencies dependencies, Key? key, dynamic args) {
+    var instance = dependencies.singletons.getOrAdd(registration, dependencies.dependencyProvider, key, args);
+    dependencies.initializationController.register(instance);
     return instance;
   }
 
-  _solveTransient(Registration registration, DependencyProvider provider,
-      Key? key, dynamic args) {
-    var instance = registration.instanceFactory(provider, key, args);
-    _initializationController.register(instance);
+  _solveTransient(Registration registration, RegistrationResolverDependencies dependencies, Key? key, dynamic args) {
+    var instance = registration.instanceFactory(dependencies.dependencyProvider, key, args);
+    dependencies.initializationController.register(instance);
     return instance;
   }
 
