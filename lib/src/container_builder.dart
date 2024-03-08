@@ -24,7 +24,7 @@ class ContainerBuilder implements ContainerRegister {
 
   @override
   RegistrationBuilder add<T>(
-      T Function(DependencyProvider) instanceFactory, Lifetime lifetime) {
+      T Function(DependencyProvider p) instanceFactory, Lifetime lifetime) {
     return _add<T>(
         (provider, key, args) => instanceFactory(provider), lifetime);
   }
@@ -39,13 +39,13 @@ class ContainerBuilder implements ContainerRegister {
 
   @override
   RegistrationBuilder addWidget<T extends Widget>(
-      T Function(DependencyProvider, Key? key, dynamic args) instanceFactory) {
+      T Function(DependencyProvider p, Key? key, dynamic args) instanceFactory) {
     return _add<T>(instanceFactory, Lifetime.transient);
   }
 
   @override
   void addScopedWidget<T extends Widget>(
-      Scope<T> Function(DependencyProvider, Key? key, dynamic args)
+      Scope<T> Function(DependencyProvider p, Key? key, dynamic args)
           instanceFactory) {
     var builder = RegistrationBuilder(
         _getScopeType<T>(), Lifetime.transient, instanceFactory);
