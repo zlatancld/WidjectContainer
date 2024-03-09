@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.0] - 2024-03-09
+### Changes
+- Promote package to stable version, after being used and tested for more than a year, ready to be shipped with the first app in mobile stores.
+- Expose dependency provider getter within a scope.
+- Add tryGet method in dependency provider.
+### Bug Fix
+- Fix initialization process for scoped and transient bindings, so that parent containers won't hold children references.
+- Store scoped instances within container requester, so that parent containers won't hold children references.
+- Resolve initialization deadlock caused by requesting an initialized widget from an initialization method.
+
 ## [0.1.10] - 2023-06-30
 ### Bug Fix
 - Pass key and args to the scope resolver when resolving a widget through a scope.
@@ -14,7 +24,7 @@
 
 ## [0.1.7] - 2023-03-18
 Initialization state.
-### Changed
+### Changes
 - Provide ReadonlyInitializationState to notify about initialization state changes.
 - Add separate initialization method in Scope.
 
@@ -24,7 +34,7 @@ Initialization state.
 - Fix initialization related to singleton resolved in parent scope.
 
 ## [0.1.4] - 2023-03-08
-### Changed
+### Changes
 - Instantiate non-transient initializables when the container is built.
 
 ### Bug Fix
@@ -37,7 +47,7 @@ Initialization state.
 ## [0.1.1] - 2023-03-04
 Preparation for pub.dev release.
 
-### Changed
+### Changes
 - Move implementation to src folder.
 - Add changelog file.
 

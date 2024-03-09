@@ -6,7 +6,7 @@ class DependencyProvider {
   DependencyProvider(this._container);
 
   T get<T>() {
-    var result = _container.tryGetByType(T);
+    var result = tryGet<T>();
     if (result == null)
       throw Exception("Type $T hasn't been registered and can't be provided.");
 
@@ -15,5 +15,9 @@ class DependencyProvider {
 
   Iterable<T> getMultiple<T>() {
     return _container.getMultiple<T>();
+  }
+
+  T? tryGet<T>() {
+    return _container.tryGetByType(T);
   }
 }

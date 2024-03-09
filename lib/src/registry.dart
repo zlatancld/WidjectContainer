@@ -9,10 +9,10 @@ class Registry implements ReadonlyRegistry {
   final Registry? _parent;
   final HashMap<Type, RegistrationResolver> _registrations;
   final HashMap<Type, List<RegistrationResolver>> _collectionRegistrations;
-  final RegistrationResolverFactory _resolverFactory;
+  final RegistrationResolverFactory _registrationResolverFactory;
 
   Registry(
-      Iterable<Registration> registrations, this._parent, this._resolverFactory)
+      Iterable<Registration> registrations, this._parent, this._registrationResolverFactory)
       : _registrations = HashMap(),
         _collectionRegistrations = HashMap() {
     for (var registration in registrations) {
@@ -38,7 +38,7 @@ class Registry implements ReadonlyRegistry {
       }
     }
 
-    return _resolverFactory.create(registration);
+    return _registrationResolverFactory.create(registration, this);
   }
 
   void _add(RegistrationResolver registration, Type type) {
