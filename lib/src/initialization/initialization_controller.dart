@@ -1,26 +1,29 @@
 import 'package:widject_container/initialization/initializable.dart';
 import 'package:widject_container/initialization/initialization_group.dart';
 import 'package:widject_container/initialization/initializer.dart';
+import 'package:widject_container/src/initialization/initializable_reference.dart';
 import 'package:widject_container/src/initialization/initialization_progress.dart';
 import 'package:widject_container/src/initialization/initialization_state.dart';
 
 class InitializationController implements Initializer {
-  final Map<Initializable, InitializationProgress> _registeredInstances = {};
+  final Map<int, InitializableReference> _registeredInstances = {};
   final InitializationController? _parent;
   final InitializationState _state;
 
   InitializationController(this._parent, this._state);
 
   void register(dynamic instance) {
-    if (instance is! Initializable || !_canBeInitialized(instance)) return;
+    var hashCode = identityHashCode(instance);
+    if (instance is! Initializable || !_canBeInitialized(hashCode)) return;
 
-    _registeredInstances[instance] = InitializationProgress.none;
+    _registeredInstances[hashCode] =
+        InitializableReference(hashCode, InitializationProgress.none, instance);
     _state.setCompleted(false);
   }
 
-  bool _canBeInitialized(Initializable initializable) {
-    return !_registeredInstances.containsKey(initializable) &&
-        _parent?._canBeInitialized(initializable) != false;
+  bool _canBeInitialized(int instanceHashCode) {
+    return !_registeredInstances.containsKey(instanceHashCode) &&
+        _parent?._canBeInitialized(instanceHashCode) != false;
   }
 
   @override
@@ -30,13 +33,14 @@ class InitializationController implements Initializer {
     if (_parent != null) await _parent!.initialize();
 
     while (_toInitializeInstances.isNotEmpty) {
-      var initializable = _getRegisteredForGroup(InitializationGroup.early) ??
+      var initializableReference = _getRegisteredForGroup(InitializationGroup.early) ??
           _getRegisteredForGroup(InitializationGroup.normal) ??
           _getRegisteredForGroup(InitializationGroup.late)!;
 
-      _registeredInstances[initializable] = InitializationProgress.inProgress;
-      await initializable.initialize();
-      _registeredInstances[initializable] = InitializationProgress.completed;
+      initializableReference.progress = InitializationProgress.inProgress;
+      await initializableReference.instance!.initialize();
+      initializableReference.instance = null;
+      initializableReference.progress = InitializationProgress.completed;
     }
 
     _state.setCompleted(true);
@@ -49,14 +53,14 @@ class InitializationController implements Initializer {
     return _parent!._hasInstancesToInitialize();
   }
 
-  Iterable<Initializable> get _toInitializeInstances => _registeredInstances
-      .entries
-      .where((mapEntry) => mapEntry.value == InitializationProgress.none)
-      .map((mapEntry) => mapEntry.key);
+  Iterable<InitializableReference> get _toInitializeInstances =>
+      _registeredInstances.entries
+          .where((mapEntry) => mapEntry.value.progress == InitializationProgress.none)
+          .map((mapEntry) => mapEntry.value);
 
-  Initializable? _getRegisteredForGroup(InitializationGroup group) {
+  InitializableReference? _getRegisteredForGroup(InitializationGroup group) {
     for (var initializable in _toInitializeInstances) {
-      if (initializable.group == group) return initializable;
+      if (initializable.instance!.group == group) return initializable;
     }
 
     return null;
