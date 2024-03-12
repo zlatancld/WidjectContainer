@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.1] - 2024-03-12
+### Bug Fix
+- Resolve parent collection dependencies correctly.
+- Prevent memory leaks by clearing reference to initializable instance as soon as it's initialized.
+
 ## [1.0.0] - 2024-03-09
 ### Changes
 - Promote package to stable version, after being used and tested for more than a year, ready to be shipped with the first app in mobile stores.

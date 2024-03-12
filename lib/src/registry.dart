@@ -72,7 +72,7 @@ class Registry implements ReadonlyRegistry {
     var collection = _getLocalCollection(type).toSet();
 
     if (_parent != null) {
-      var parentLocalCollection = _parent!._getLocalCollection(type);
+      var parentLocalCollection = _parent!.getCollection(type);
       collection.addAll(parentLocalCollection);
     }
 
