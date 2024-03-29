@@ -33,9 +33,10 @@ class InitializationController implements Initializer {
     if (_parent != null) await _parent!.initialize();
 
     while (_toInitializeInstances.isNotEmpty) {
-      var initializableReference = _getRegisteredForGroup(InitializationGroup.early) ??
-          _getRegisteredForGroup(InitializationGroup.normal) ??
-          _getRegisteredForGroup(InitializationGroup.late)!;
+      var initializableReference =
+          _getRegisteredForGroup(InitializationGroup.early) ??
+              _getRegisteredForGroup(InitializationGroup.normal) ??
+              _getRegisteredForGroup(InitializationGroup.late)!;
 
       initializableReference.progress = InitializationProgress.inProgress;
       await initializableReference.instance!.initialize();
@@ -43,7 +44,9 @@ class InitializationController implements Initializer {
       initializableReference.progress = InitializationProgress.completed;
     }
 
-    _state.setCompleted(true);
+    if(_areAllInstancesInitialized){
+      _state.setCompleted(true);
+    }
   }
 
   bool _hasInstancesToInitialize() {
@@ -55,7 +58,8 @@ class InitializationController implements Initializer {
 
   Iterable<InitializableReference> get _toInitializeInstances =>
       _registeredInstances.entries
-          .where((mapEntry) => mapEntry.value.progress == InitializationProgress.none)
+          .where((mapEntry) =>
+              mapEntry.value.progress == InitializationProgress.none)
           .map((mapEntry) => mapEntry.value);
 
   InitializableReference? _getRegisteredForGroup(InitializationGroup group) {
@@ -65,4 +69,7 @@ class InitializationController implements Initializer {
 
     return null;
   }
+
+  bool get _areAllInstancesInitialized => _registeredInstances.values
+      .every((element) => element.progress == InitializationProgress.completed);
 }
