@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.2] - 2024-03-30
+### Bug Fix
+- Mark initialization as completed only when all registered instances have been initialized.
+
 ## [1.0.1] - 2024-03-12
 ### Bug Fix
 - Resolve parent collection dependencies correctly.
