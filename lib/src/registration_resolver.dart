@@ -1,3 +1,4 @@
+import 'package:widject_container/disposable.dart';
 import 'package:widject_container/lifetime.dart';
 import 'package:widject_container/src/registration.dart';
 import 'package:flutter/foundation.dart';
@@ -25,12 +26,18 @@ class RegistrationResolver {
   _solveSingleton(Registration registration, RegistrationResolverDependencies dependencies, Key? key, dynamic args) {
     var instance = dependencies.singletons.getOrAdd(registration, dependencies.dependencyProvider, key, args);
     dependencies.initializationController.register(instance);
+    if(instance is Disposable){
+      dependencies.disposables.add(instance);
+    }
     return instance;
   }
 
   _solveTransient(Registration registration, RegistrationResolverDependencies dependencies, Key? key, dynamic args) {
     var instance = registration.instanceFactory(dependencies.dependencyProvider, key, args);
     dependencies.initializationController.register(instance);
+    if(instance is Disposable){
+      dependencies.disposables.add(instance);
+    }
     return instance;
   }
 

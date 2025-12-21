@@ -1,6 +1,10 @@
+import 'dart:collection';
+
 import 'package:widject_container/container_register.dart';
+import 'package:widject_container/disposable.dart';
 import 'package:widject_container/initialization/initializable.dart';
 import 'package:widject_container/initialization/readonly_initialization_state.dart';
+import 'package:widject_container/scope_widget.dart';
 import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
@@ -16,6 +20,7 @@ import 'package:widject_container/scope.dart';
 import 'package:widject_container/src/singletons.dart';
 import 'package:widject_container/widget_provider.dart';
 import 'package:flutter/widgets.dart';
+import 'package:widject_container/widget_resolver.dart';
 
 class ContainerBuilder implements ContainerRegister {
   final List<RegistrationBuilder> _builders;
@@ -45,17 +50,23 @@ class ContainerBuilder implements ContainerRegister {
     return _add<T>(instanceFactory, Lifetime.transient);
   }
 
+  @Deprecated("Use addScopeForWidget instead")
   @override
   void addScopedWidget<T extends Widget>(
       Scope<T> Function(DependencyProvider p, Key? key, dynamic args)
           instanceFactory) {
-    var builder = RegistrationBuilder(
-        _getScopeType<T>(), Lifetime.transient, instanceFactory);
+    var builder =
+        RegistrationBuilder(Scope<T>, Lifetime.transient, instanceFactory);
     _builders.add(builder);
   }
 
-  Type _getScopeType<T extends Widget>() {
-    return Scope<T>;
+  @override
+  void addScopeForWidget<T extends Widget>(
+      ScopeWidget<T> Function(DependencyProvider p1, Key? key, dynamic args)
+          scopeInstanceFactory) {
+    var builder = RegistrationBuilder(
+        ScopeWidget<T>, Lifetime.transient, scopeInstanceFactory);
+    _builders.add(builder);
   }
 
   @override
@@ -64,19 +75,20 @@ class ContainerBuilder implements ContainerRegister {
   }
 
   DependencyContainer build(DependencyProvider? parentProvider) {
-    _addWidgetProvider();
+    _addWidgetServices();
 
     var singletons = _createSingletons();
     var initializationController =
         _createInitializationController(parentProvider);
-    var registry =
-        _createRegistry(parentProvider, singletons, initializationController);
-    var container =
-        DependencyContainer(registry, singletons, initializationController);
+    var disposables = HashSet<Disposable>();
+    var registry = _createRegistry(
+        parentProvider, singletons, initializationController, disposables);
+    var container = DependencyContainer(
+        registry, singletons, initializationController, disposables);
 
     _addPostRegistry(container, registry);
     _preWarmSingletonInitializables(
-        registry, container, singletons, initializationController);
+        registry, container, singletons, initializationController, disposables);
 
     return container;
   }
@@ -97,11 +109,13 @@ class ContainerBuilder implements ContainerRegister {
   Registry _createRegistry(
       DependencyProvider? parentProvider,
       Singletons singletons,
-      InitializationController initializationController) {
+      InitializationController initializationController,
+      HashSet<Disposable> disposables) {
     var registrations = _builders.map((builder) => builder.build());
     var parentRegistry = parentProvider?.get<Registry>();
-    var resolverFactory =
-        RegistrationResolverFactory(singletons, initializationController);
+
+    var resolverFactory = RegistrationResolverFactory(
+        singletons, initializationController, disposables);
 
     var registry = Registry(registrations, parentRegistry, resolverFactory);
     _addPostRegistry(registry, registry);
@@ -115,9 +129,14 @@ class ContainerBuilder implements ContainerRegister {
     return singletons;
   }
 
-  void _addWidgetProvider() {
+  void _addWidgetServices() {
     add<WidgetProvider>(
-        (p) => WidgetProvider(
+        (p) => WidgetProvider(p.get<DependencyContainer>(),
+            p.get<InitializationController>(), p.get<WidgetResolver>()),
+        Lifetime.transient);
+
+    add<WidgetResolver>(
+        (p) => WidgetResolver(
             p.get<DependencyContainer>(), p.get<InitializationController>()),
         Lifetime.transient);
   }
@@ -133,13 +152,17 @@ class ContainerBuilder implements ContainerRegister {
       Registry registry,
       DependencyContainer container,
       Singletons singletons,
-      InitializationController initializationController) {
+      InitializationController initializationController,
+      HashSet<Disposable> disposables) {
     var nonTransientRegistrations = registry
         .getCollection(Initializable)
         .where((element) => element.lifetime == Lifetime.singleton);
 
     var resolverDependencies = RegistrationResolverDependencies(
-        DependencyProvider(container), singletons, initializationController);
+        DependencyProvider(container),
+        singletons,
+        initializationController,
+        disposables);
     for (var registration in nonTransientRegistrations) {
       registration.solve(resolverDependencies);
     }

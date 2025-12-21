@@ -7,6 +7,5 @@ class InitializableReference {
   Initializable? instance;
 
   InitializableReference(
-      this.instanceHash, this.progress, Initializable instance)
-      : instance = instance;
+      this.instanceHash, this.progress, Initializable this.instance);
 }

@@ -6,13 +6,14 @@ import 'package:widject_container/src/registration_resolver.dart';
 import 'package:widject_container/src/registration_resolver_factory.dart';
 
 class Registry implements ReadonlyRegistry {
-  final Registry? _parent;
   final HashMap<Type, RegistrationResolver> _registrations;
   final HashMap<Type, List<RegistrationResolver>> _collectionRegistrations;
   final RegistrationResolverFactory _registrationResolverFactory;
+  Registry? _parent;
+  bool _disposed = false;
 
-  Registry(
-      Iterable<Registration> registrations, this._parent, this._registrationResolverFactory)
+  Registry(Iterable<Registration> registrations, this._parent,
+      this._registrationResolverFactory)
       : _registrations = HashMap(),
         _collectionRegistrations = HashMap() {
     for (var registration in registrations) {
@@ -60,8 +61,11 @@ class Registry implements ReadonlyRegistry {
 
   @override
   RegistrationResolver? tryGet(Type type) {
-    var registration = _registrations[type];
+    if (_disposed) {
+      throw Exception("Registry has been disposed.");
+    }
 
+    var registration = _registrations[type];
     if (registration != null) return registration;
 
     return _parent?.tryGet(type);
@@ -69,6 +73,10 @@ class Registry implements ReadonlyRegistry {
 
   @override
   Iterable<RegistrationResolver> getCollection(Type type) {
+    if (_disposed) {
+      throw Exception("Registry has been disposed.");
+    }
+
     var collection = _getLocalCollection(type).toSet();
 
     if (_parent != null) {
@@ -86,6 +94,14 @@ class Registry implements ReadonlyRegistry {
     var singleRegistration = tryGet(type);
     if (singleRegistration != null) return [singleRegistration];
 
-    return Iterable<RegistrationResolver>.empty();
+    return const Iterable<RegistrationResolver>.empty();
+  }
+
+  @override
+  void dispose() {
+    if (_disposed) return;
+
+    _parent = null;
+    _disposed = true;
   }
 }

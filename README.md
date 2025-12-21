@@ -9,6 +9,7 @@ Simple DI package to help structure your Flutter application in loosely coupled 
   - No use of reflection/mirrors.
 - Nested scope support to isolate dependencies by widget type.
 - Async initialization of scoped dependencies.
+- Automatic disposal of registered instances that implement `Disposable`, triggered by the widget lifecycle.
 
 ## Installation
 
@@ -16,16 +17,18 @@ Add the package with the command: ```flutter pub add widject_container``` or add
 
 ## Basic Usage
 
-Create a scope connected to a widget and register the required types. The type references are automatically resolved when requested within the scope.
+A **scope** is itself a widget (`ScopeWidget`). It defines which dependencies are available within that part of the widget tree. Use `install` to register types, and `addWidget` to register the widget that the scope builds.
 
 ```dart
-class AppScope extends Scope<AppWidget> {
-  AppScope(): super(null);
+class AppScope extends ScopeWidget<AppWidget> {
+  const AppScope({super.key}) : super.createImmediate();
 
   @override
-  void configure(ContainerRegister register) {
-    register.add((r) => HelloWorldProvider(), Lifetime.transient).as<MessageProvider>();
-    register.addWidget((r, key, _) => AppWidget(r.get(), key: key));
+  void install(ContainerRegister register) {
+    register.addWidget((p, key, args) => AppWidget(p.get(), key: key));
+    register
+        .add((p) => TapMessageProvider(), Lifetime.transient)
+        .as<MessageProvider>();
   }
 }
 ```
@@ -39,17 +42,16 @@ abstract class MessageProvider {
 ```
 
 ```dart
-class HelloWorldProvider implements MessageProvider {
+class TapMessageProvider implements MessageProvider {
   @override
-  String getMessage()
-    => "Hello world!";
+  String getMessage() => "Tap Here!";
 }
 ```
 
 ```dart
 class AppWidget extends StatelessWidget {
   final MessageProvider _messageProvider;
-  
+
   const AppWidget(this._messageProvider, {super.key});
 
   @override
@@ -64,49 +66,45 @@ class AppWidget extends StatelessWidget {
 }
 ```
 
-Example of scope usage in main function is:
+The scope is the entry point. Pass it directly to `runApp`:
 
 ```dart
 void main() {
-  var app = AppScope().getWidget();
-  runApp(app);
+  runApp(const AppScope());
 }
 ```
 
-### Widget Provider
+### Widget Resolver
 
-Use ```WidgetProvider``` to instantiate widget types that have been registered within a scope. Dependencies are resolved and explicitly injected, as defined in the scope registration.
+Use `WidgetResolver` to instantiate widgets registered within a scope. Dependencies are resolved and explicitly injected, as defined in the scope registration.
 
 Example of registration:
 
 ```dart
-class AppScope extends Scope<AppWidget> {
+class AppScope extends ScopeWidget<AppWidget> {
   ...
 
   @override
-  void configure(ContainerRegister register) {
+  void install(ContainerRegister register) {
     ...
-    register.addWidget((r, key, _) => NewWidget(r.get(), args, key: key));
+    register.addWidget((p, key, args) => AppWidget(p.get(), key: key));
   }
 }
 ```
 
-Example of usage through ```WidgetProvider```:
+Example of usage through `WidgetResolver`:
 
 ```dart
 class AppWidget extends StatelessWidget {
-  final MessageProvider _messageProvider;
-  final WidgetProvider _widgetProvider;
-  
-  const AppWidget(this._messageProvider, this._widgetProvider, {super.key});
+  final WidgetResolver _widgetResolver;
+
+  const AppWidget(this._widgetResolver, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WidjectContainer Demo',
-      home: Scaffold(
-        body: _widgetProvider.getWidget<NewWidget>())
-      )
+      home: Scaffold(body: _widgetResolver.resolve<HomeScreenWidget>())
     );
   }
 }
@@ -114,61 +112,122 @@ class AppWidget extends StatelessWidget {
 
 ### Nested Scopes
 
-Connect the instantiation of a widget to a new scope, registering types and inheriting references from ancestor scopes.
-This can be useful when creating a new screen that requires a whole new set of dependencies.
+Nest a scope inside a parent scope using `addScopeForWidget`. The child scope inherits all dependencies registered in ancestor scopes and can define its own. This is ideal for screens or features that require an isolated set of dependencies.
 
 ```dart
-class ScreenScope extends Scope<ScreenWidget>{
-  ScreenScope(super.parentContainer);
+class HomeScope extends ScopeWidget<HomeScreenWidget> {
+  const HomeScope({super.args, super.key}) : super.createDeferred();
 
   @override
-  void configure(ContainerRegister register) {
-    register.addWidget((r, key, args) => ScreenWidget(...));
+  void install(ContainerRegister register) {
+    register.addWidget((p, key, args) => HomeScreenWidget(p.get(), p.get()));
+    register
+        .add((p) => TapMessageProvider(), Lifetime.transient)
+        .as<MessageProvider>();
+    register.addScopeForWidget(
+        (p, key, args) => OtherScreenScope(key: key, args: args));
   }
 }
 ```
 
-Where the scoped widget binding in the parent scope is:
+In the parent scope, bind the child scope using `addScopeForWidget`:
 
 ```dart
-class AppScope extends Scope<AppWidget> {
+class AppScope extends ScopeWidget<AppWidget> {
   ...
 
   @override
-  void configure(ContainerRegister register) {
+  void install(ContainerRegister register) {
     ...
-    register.addScopedWidget((r, key, _) => ScreenScope(r));
+    register.addScopeForWidget(
+        (p, key, args) => HomeScope(key: key, args: args));
   }
 }
 ```
 
-Example of usage through ```WidgetProvider```:
+The child widget is then resolved via `WidgetResolver`, which automatically wraps the scope around it:
 
 ```dart
-class AppWidget extends StatelessWidget {
+class HomeScreenWidget extends StatelessWidget {
   final MessageProvider _messageProvider;
-  final WidgetProvider _widgetProvider;
+  final WidgetResolver _widgetResolver;
 
-  const AppWidget(this._messageProvider, this._widgetProvider, {super.key});
+  const HomeScreenWidget(this._messageProvider, this._widgetResolver, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'WidjectContainer Demo',
-      home: Scaffold(
-        body: TextButton(
-          onPressed: () => _openChildWidget(context),
-          child: Text(_messageProvider.getMessage()))));
-  }
-
-  _openChildWidget(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => _widgetProvider.getWidget<ScreenWidget>()));
+    return Scaffold(
+      body: TextButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => _widgetResolver.resolve<OtherScreenWidget>())),
+        child: Text(_messageProvider.getMessage())));
   }
 }
 ```
+
+### Disposal
+
+Any registered instance that implements the `Disposable` interface will have its `dispose` method called automatically when the scope widget is removed from the widget tree.
+
+```dart
+class MyService implements Disposable {
+  @override
+  void dispose() {
+    // clean up resources
+  }
+}
+```
+
+Register it as usual within a scope:
+
+```dart
+register.add((p) => MyService(), Lifetime.singleton).as<MyService>();
+```
+
+### Async Initialization
+
+Register types implementing `Initializable` to perform async work before the scope's widget is shown. Use `createDeferred` in the scope constructor to defer rendering until initialization is complete.
+
+```dart
+class MyInitializable implements Initializable {
+  @override
+  InitializationGroup get group => InitializationGroup.normal;
+
+  @override
+  Future initialize() async {
+    // async setup
+  }
+}
+```
+
+```dart
+class MyScope extends ScopeWidget<MyWidget> {
+  const MyScope({super.key}) : super.createDeferred();
+
+  @override
+  void install(ContainerRegister register) {
+    register.addWidget((p, key, args) => MyWidget(key: key));
+    register
+        .add((p) => MyInitializable(), Lifetime.singleton)
+        .as<Initializable>();
+  }
+}
+```
+
+### Debug Logging
+
+Enable scope lifecycle logs (init, build, dispose) during development via `WidjectSettings`:
+
+```dart
+void main() {
+  WidjectSettings.enableDebugLogs = true;
+  runApp(const AppScope());
+}
+```
+
+Logs are always disabled in release builds regardless of this setting.
 
 ## Credits
 
