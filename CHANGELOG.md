@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.0] - 2026-03-01
+### Changes
+- **Scope is now a widget (`ScopeWidget`)**: the scope is directly part of the widget tree, bound to the Flutter widget lifecycle. This means the scope is created when the widget is mounted and torn down when it is removed from the tree.
+- **Automatic disposal**: registered instances that implement the `Disposable` interface are automatically disposed when their scope widget is removed from the tree, without any manual wiring.
+- **Debug logging**: added `WidjectSettings.enableDebugLogs` to enable scope lifecycle logs (init, build, dispose) during development. Logs are always disabled in release builds.
+- Replace deprecated `WidgetProvider` with `WidgetResolver` for resolving widgets within a scope.
+
 ## [1.0.2] - 2024-03-30
 ### Bug Fix
 - Mark initialization as completed only when all registered instances have been initialized.

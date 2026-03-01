@@ -1,11 +1,12 @@
-import 'package:widject_container/src/container_builder.dart';
+import 'package:widject_container/container_builder.dart';
 import 'package:widject_container/container_register.dart';
 import 'package:widject_container/src/dependency_container.dart';
 import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
 import 'package:flutter/widgets.dart';
 
-abstract class Scope<T extends Widget> {
+@Deprecated("Use ScopeWidget instead")
+abstract class Scope<T extends Widget>{
   final DependencyProvider? _parentDependencyProvider;
   DependencyContainer? _dependencyContainer;
 
@@ -21,8 +22,9 @@ abstract class Scope<T extends Widget> {
     var container = _getDependencyContainer();
     var widget = container.tryGet<T>(key: key, args: args);
 
-    if (widget == null)
+    if (widget == null) {
       throw Exception("Widget $T hasn't been registered in scope $runtimeType");
+    }
 
     return widget;
   }

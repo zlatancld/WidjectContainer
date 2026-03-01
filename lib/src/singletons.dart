@@ -1,10 +1,11 @@
 import 'dart:collection';
 
 import 'package:widject_container/dependency_provider.dart';
+import 'package:widject_container/disposable.dart';
 import 'package:widject_container/src/registration.dart';
 import 'package:flutter/foundation.dart';
 
-class Singletons {
+class Singletons implements Disposable {
   final HashMap<Registration, dynamic> _instances;
 
   Singletons() : _instances = HashMap();
@@ -21,5 +22,10 @@ class Singletons {
     var instance = registration.instanceFactory(dependencyProvider, key, args);
     _instances[registration] = instance;
     return instance;
+  }
+
+  @override
+  void dispose() {
+    _instances.clear();
   }
 }

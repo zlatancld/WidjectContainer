@@ -9,6 +9,7 @@ class InitializationController implements Initializer {
   final Map<int, InitializableReference> _registeredInstances = {};
   final InitializationController? _parent;
   final InitializationState _state;
+  Future? _pendingInitialization;
 
   InitializationController(this._parent, this._state);
 
@@ -27,10 +28,27 @@ class InitializationController implements Initializer {
   }
 
   @override
-  Future initialize() async {
-    if (!_hasInstancesToInitialize()) return;
+  Future initialize() => _initializeWithPendingTask(updateState: true);
 
-    if (_parent != null) await _parent!.initialize();
+  Future _initializeFromChildren() =>
+      _initializeWithPendingTask(updateState: false);
+
+  Future _initializeWithPendingTask({required bool updateState}) {
+    if (!_hasInstancesToInitialize()) {
+      _tryUpdateCompletedState(true, updateState);
+      return Future.value(true);
+    }
+
+    if (_pendingInitialization != null) return _pendingInitialization!;
+
+    _pendingInitialization = _startInitialization(updateState);
+    return _pendingInitialization!;
+  }
+
+  Future _startInitialization(bool updateState) async {
+    _tryUpdateCompletedState(false, updateState);
+
+    if (_parent != null) await _parent!._initializeFromChildren();
 
     while (_toInitializeInstances.isNotEmpty) {
       var initializableReference =
@@ -44,9 +62,13 @@ class InitializationController implements Initializer {
       initializableReference.progress = InitializationProgress.completed;
     }
 
-    if(_areAllInstancesInitialized){
-      _state.setCompleted(true);
-    }
+    _tryUpdateCompletedState(true, updateState);
+    _pendingInitialization = null;
+  }
+
+  void _tryUpdateCompletedState(bool newState, bool canUpdateState) {
+    if (!canUpdateState) return;
+    _state.setCompleted(newState);
   }
 
   bool _hasInstancesToInitialize() {
@@ -59,7 +81,7 @@ class InitializationController implements Initializer {
   Iterable<InitializableReference> get _toInitializeInstances =>
       _registeredInstances.entries
           .where((mapEntry) =>
-              mapEntry.value.progress == InitializationProgress.none)
+              mapEntry.value.progress != InitializationProgress.completed)
           .map((mapEntry) => mapEntry.value);
 
   InitializableReference? _getRegisteredForGroup(InitializationGroup group) {
@@ -69,7 +91,4 @@ class InitializationController implements Initializer {
 
     return null;
   }
-
-  bool get _areAllInstancesInitialized => _registeredInstances.values
-      .every((element) => element.progress == InitializationProgress.completed);
 }

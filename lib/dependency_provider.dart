@@ -7,8 +7,9 @@ class DependencyProvider {
 
   T get<T>() {
     var result = tryGet<T>();
-    if (result == null)
+    if (result == null) {
       throw Exception("Type $T hasn't been registered and can't be provided.");
+    }
 
     return result;
   }

@@ -11,7 +11,7 @@ class InitializationState extends ReadonlyInitializationState {
     _isCompleted = isCompleted;
 
     if (notify) {
-      notifyListeners();
+      Future.microtask(() => notifyListeners());
     }
   }
 }
