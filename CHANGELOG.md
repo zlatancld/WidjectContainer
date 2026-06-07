@@ -3,6 +3,7 @@
 ## [2.1.0] - 2026-06-07
 ### Changes
 - Log `Initializable` execution time when `WidjectSettings.enableDebugLogs` is enabled.
+- Set SDK constraint to '>=2.19.0 <4.0.0'.
 
 ## [2.0.0] - 2026-03-01
 ### Changes
