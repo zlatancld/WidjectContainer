@@ -218,7 +218,7 @@ class MyScope extends ScopeWidget<MyWidget> {
 
 ### Debug Logging
 
-Enable scope lifecycle logs (init, build, dispose) during development via `WidjectSettings`:
+Enable scope lifecycle logs and initializable execution-time logs during development via `WidjectSettings`:
 
 ```dart
 void main() {
