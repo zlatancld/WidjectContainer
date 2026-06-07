@@ -1,6 +1,7 @@
 import 'package:widject_container/initialization/initializable.dart';
 import 'package:widject_container/initialization/initialization_group.dart';
 import 'package:widject_container/initialization/initializer.dart';
+import 'package:widject_container/src/debug_log.dart';
 import 'package:widject_container/src/initialization/initializable_reference.dart';
 import 'package:widject_container/src/initialization/initialization_progress.dart';
 import 'package:widject_container/src/initialization/initialization_state.dart';
@@ -57,7 +58,12 @@ class InitializationController implements Initializer {
               _getRegisteredForGroup(InitializationGroup.late)!;
 
       initializableReference.progress = InitializationProgress.inProgress;
-      await initializableReference.instance!.initialize();
+      var initializable = initializableReference.instance!;
+      var stopwatch = Stopwatch()..start();
+      await initializable.initialize();
+      stopwatch.stop();
+      debugLog(
+          "⏱ INITIALIZE ${initializable.runtimeType} (${stopwatch.elapsedMilliseconds} ms)");
       initializableReference.instance = null;
       initializableReference.progress = InitializationProgress.completed;
     }

@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.0] - 2026-06-07
+### Changes
+- Log `Initializable` execution time when `WidjectSettings.enableDebugLogs` is enabled.
+
 ## [2.0.0] - 2026-03-01
 ### Changes
 - **Scope is now a widget (`ScopeWidget`)**: the scope is directly part of the widget tree, bound to the Flutter widget lifecycle. This means the scope is created when the widget is mounted and torn down when it is removed from the tree.

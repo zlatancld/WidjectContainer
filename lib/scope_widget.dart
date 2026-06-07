@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:widject_container/container_provider.dart';
 import 'package:widject_container/container_register.dart';
@@ -6,9 +5,9 @@ import 'package:widject_container/dependency_provider.dart';
 import 'package:widject_container/initialization/initializer.dart';
 import 'package:widject_container/deferred_future_widget.dart';
 import 'package:widject_container/installer.dart';
+import 'package:widject_container/src/debug_log.dart';
 import 'package:widject_container/src/scope_container.dart';
 import 'package:widject_container/widget_provider.dart';
-import 'package:widject_container/widject_settings.dart';
 
 abstract class ScopeWidget<T extends Widget> extends StatefulWidget
     implements Installer {
@@ -99,14 +98,6 @@ class _State<T extends Widget> extends State<ScopeWidget<T>> {
   final ScopeContainer _scopeContainer = ScopeContainer();
   final String _stateId = DateTime.now().toIso8601String();
 
-  void _debugPrint(String message) {
-    if (kDebugMode) {
-      if (WidjectSettings.enableDebugLogs) {
-        print(message);
-      }
-    }
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -129,7 +120,7 @@ class _State<T extends Widget> extends State<ScopeWidget<T>> {
 
   @override
   void initState() {
-    _debugPrint("🟢 INIT State $T ($_stateId)");
+    debugLog("🟢 INIT State $T ($_stateId)");
     super.initState();
   }
 
@@ -138,7 +129,7 @@ class _State<T extends Widget> extends State<ScopeWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    _debugPrint("⚡ BUILD State $T ($_stateId)");
+    debugLog("⚡ BUILD State $T ($_stateId)");
     var dependencyProvider = _getDependencyProvider();
     return ContainerProvider(
         container: dependencyProvider,
@@ -147,7 +138,7 @@ class _State<T extends Widget> extends State<ScopeWidget<T>> {
 
   @override
   void dispose() {
-    _debugPrint("🔴 DISPOSE State $T ($_stateId)");
+    debugLog("🔴 DISPOSE State $T ($_stateId)");
     _scopeContainer.dispose();
     super.dispose();
   }
