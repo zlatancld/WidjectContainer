@@ -190,6 +190,8 @@ register.add((p) => MyService(), Lifetime.singleton).as<MyService>();
 
 Register types implementing `Initializable` to perform async work before the scope's widget is shown. Use `createDeferred` in the scope constructor to defer rendering until initialization is complete.
 
+Initialization state notifications are ignored after the owning scope has been disposed, which prevents late async completion from triggering widget updates on listeners that are already gone.
+
 ```dart
 class MyInitializable implements Initializable {
   @override
