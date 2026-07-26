@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.1] - 2026-07-17
+### Bug Fix
+- Prevent deferred initialization state notifications from updating listeners after the owning scope has already been disposed.
+
 ## [2.1.0] - 2026-06-07
 ### Changes
 - Log `Initializable` execution time when `WidjectSettings.enableDebugLogs` is enabled.
